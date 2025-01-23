@@ -1,4 +1,4 @@
-package org.study.app.dto;
+package org.study.app.rest.dto;
 
 public class CreateUserRequestDTO {
   private String name;

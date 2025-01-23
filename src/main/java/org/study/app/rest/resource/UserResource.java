@@ -1,9 +1,9 @@
-package org.study.app.resource;
+package org.study.app.rest.resource;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.study.app.dto.CreateUserRequestDTO;
+import org.study.app.rest.dto.CreateUserRequestDTO;
 
 import java.util.List;
 
