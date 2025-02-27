@@ -1,7 +1,12 @@
 package org.study.app.rest.resource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -9,8 +14,7 @@ import org.study.app.domain.model.User;
 import org.study.app.domain.repository.UserRepository;
 import org.study.app.rest.dto.CreateUserRequestDTO;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -18,15 +22,31 @@ import java.util.Optional;
 public class UserResource {
 
     private final UserRepository userRepository;
+    private final Validator validator;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
-    public UserResource(UserRepository userRepository) {
+    public UserResource(UserRepository userRepository, Validator validator) {
         this.userRepository = userRepository;
+        this.validator = validator;
     }
 
     @POST
     @Transactional
     public Response createUser(CreateUserRequestDTO requestDTO) {
+
+        Set<ConstraintViolation<CreateUserRequestDTO>> validations = validator.validate(requestDTO);
+        if (!validations.isEmpty()) {
+            ConstraintViolation<CreateUserRequestDTO> createUserRequestDTOConstraintViolation = validations.stream().findAny().get();
+            var message = createUserRequestDTOConstraintViolation.getMessage();
+            Map<String, String> responseError = new HashMap<>();
+            responseError.put("response", message);
+            try {
+                return Response.status(Response.Status.BAD_REQUEST).entity(mapper.writeValueAsString(responseError)).build();
+            } catch (JsonProcessingException e) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+            }
+        }
 
         var user = new User();
         user.setAge(requestDTO.getAge());
