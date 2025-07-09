@@ -1,7 +1,13 @@
-package org.study.app.dto;
+package org.study.app.rest.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateUserRequestDTO {
+
+  @NotBlank(message = "Name is required")
   private String name;
+  @NotNull(message = "Age is required")
   private Integer age;
 
 

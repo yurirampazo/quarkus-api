@@ -1,8 +1,8 @@
 quarkus:
-#  DATASOURCE CONFIGS
+  #  DATASOURCE CONFIGS
   datasource:
     db-kind: postgresql
-    username: root
+    username: yuri
     password: 123456
     jdbc:
       url: jdbc:postgres://localhost:5432/quarkus_social
