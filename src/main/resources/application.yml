@@ -1,0 +1,9 @@
+quarkus:
+  #  DATASOURCE CONFIGS
+  datasource:
+    db-kind: postgresql
+    username: yuri
+    password: 123456
+    jdbc:
+      url: jdbc:postgres://localhost:5432/quarkus_social
+      max-size: 16

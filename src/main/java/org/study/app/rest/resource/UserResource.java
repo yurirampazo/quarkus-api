@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import org.study.app.domain.model.User;
 import org.study.app.domain.repository.UserRepository;
 import org.study.app.rest.dto.CreateUserRequestDTO;
+import org.study.app.rest.dto.ResponseError;
 
 import java.util.*;
 
@@ -37,27 +38,13 @@ public class UserResource {
 
         Set<ConstraintViolation<CreateUserRequestDTO>> validations = validator.validate(requestDTO);
         if (!validations.isEmpty()) {
-            ConstraintViolation<CreateUserRequestDTO> createUserRequestDTOConstraintViolation = validations.stream().findAny().get();
-            var message = createUserRequestDTOConstraintViolation.getMessage();
-            Map<String, String> responseError = new HashMap<>();
-            responseError.put("response", message);
-            try {
-                return Response.status(Response.Status.BAD_REQUEST).entity(mapper.writeValueAsString(responseError)).build();
-            } catch (JsonProcessingException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            }
+            ResponseError errorResponse = ResponseError.createFromValidation(validations);
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
-
         var user = new User();
         user.setAge(requestDTO.getAge());
         user.setName(requestDTO.getName());
-
         userRepository.persist(user);
-//        PANACHE Samples methods
-//        user.delete();
-//        User.count();
-//        User.delete("DELETE FROM ...")
-
         return Response.ok(user).build();
     }
 
