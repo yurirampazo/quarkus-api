@@ -15,6 +15,8 @@ import org.study.app.rest.dto.ResponseError;
 
 import java.util.*;
 
+import static org.study.app.rest.dto.ResponseError.UNPROCESSABLE_ENTITY;
+
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,14 +38,15 @@ public class UserResource {
 
         Set<ConstraintViolation<CreateUserRequestDTO>> validations = validator.validate(requestDTO);
         if (!validations.isEmpty()) {
-            ResponseError errorResponse = ResponseError.createFromValidation(validations);
-            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+            return ResponseError.createFromValidation(validations).withStatusCode(UNPROCESSABLE_ENTITY);
         }
         var user = new User();
         user.setAge(requestDTO.getAge());
         user.setName(requestDTO.getName());
         userRepository.persist(user);
-        return Response.ok(user).build();
+        return Response.status(Response.Status.CREATED.getStatusCode())
+                .entity(user)
+                .build();
     }
 
     @GET
