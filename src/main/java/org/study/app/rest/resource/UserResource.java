@@ -24,12 +24,13 @@ public class UserResource {
 
     private final UserRepository userRepository;
     private final Validator validator;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
     @Inject
     public UserResource(UserRepository userRepository, Validator validator) {
         this.userRepository = userRepository;
         this.validator = validator;
+        mapper  = new ObjectMapper();
     }
 
     @POST

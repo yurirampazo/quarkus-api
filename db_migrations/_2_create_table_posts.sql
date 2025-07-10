@@ -1,0 +1,8 @@
+CREATE DATABASE quakus_social;
+
+CREATE TABLE "POSTS" (
+	id bigserial NOT NULL PRIMARY KEY,
+    post_text VARCHAR(150) NOT NULL,
+	dateTime TIMESTAMP,
+	user_id BIGINT NOT NULL REFERENCES USERS.id
+);
