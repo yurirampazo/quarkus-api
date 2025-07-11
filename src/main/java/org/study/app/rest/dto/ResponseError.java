@@ -13,19 +13,19 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseError {
-    public static final int UNPROCESSABLE_ENTITY = 422;
+  public static final int UNPROCESSABLE_ENTITY = 422;
 
-    private String message;
-    private List<FieldError> errors;
+  private String message;
+  private List<FieldError> errors;
 
-    public static <T> ResponseError createFromValidation(Set<ConstraintViolation<T>> violations) {
-        var errors = violations.stream().map(constViol ->
+  public static <T> ResponseError createFromValidation(Set<ConstraintViolation<T>> violations) {
+    var errors = violations.stream().map(constViol ->
                 new FieldError(constViol.getPropertyPath().toString(), constViol.getMessage()))
-                .toList();
-        return new ResponseError("Validation Errors", errors);
-    }
+          .toList();
+    return new ResponseError("Validation Errors", errors);
+  }
 
-    public Response withStatusCode(int code) {
-        return Response.status(code).entity(this).build();
-    }
+  public Response withStatusCode(int code) {
+    return Response.status(code).entity(this).build();
+  }
 }
