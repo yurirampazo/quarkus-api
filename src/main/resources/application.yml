@@ -1,9 +1,17 @@
 quarkus:
-  #  DATASOURCE CONFIGS
   datasource:
     db-kind: postgresql
     username: yuri
     password: 123456
     jdbc:
-      url: jdbc:postgres://localhost:5432/quarkus_social
-      max-size: 16
+      url: jdbc:postgresql://localhost:5432/quarkus_social
+    max-size: 16
+
+  hibernate-orm:
+    database:
+      generation: update
+    log:
+      sql: true
+
+  log:
+    level: INFO
