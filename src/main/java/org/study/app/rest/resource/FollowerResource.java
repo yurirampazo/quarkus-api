@@ -9,12 +9,16 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.study.app.AppUtils;
 import org.study.app.domain.model.Follower;
 import org.study.app.domain.repository.FollowerRepository;
 import org.study.app.domain.repository.UserRepository;
 import org.study.app.rest.dto.FollowerRequestDTO;
+import org.study.app.rest.dto.FollowerResponseDTO;
+import org.study.app.rest.dto.UserFollowersResponseDTO;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @Path("/users/{userId}/followers")
@@ -24,17 +28,18 @@ public class FollowerResource {
 
   private final UserRepository userRepository;
   private final FollowerRepository followerRepository;
+  private final AppUtils appUtils;
   private final Validator validator;
-  private final ObjectMapper mapper;
+  private ObjectMapper mapper = new ObjectMapper();
 
   @Inject
-  public FollowerResource(UserRepository userRepository, FollowerRepository followerRepository, Validator validator) {
+  public FollowerResource(UserRepository userRepository, FollowerRepository followerRepository,
+                          AppUtils appUtils, Validator validator) {
     this.userRepository = userRepository;
     this.followerRepository = followerRepository;
+    this.appUtils = appUtils;
     this.validator = validator;
-    mapper = new ObjectMapper();
   }
-
 
   @PUT
   @Transactional
@@ -51,15 +56,18 @@ public class FollowerResource {
       }
     }
 
-    var user = userRepository.findById(userId);
-    if (user == null) {
+    var optionalUser = appUtils.findUserIfExist(userId);
+    if (optionalUser.isEmpty()) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
-    var follower = userRepository.findById(request.getFollowerId());
-    if (follower == null) {
+    var followerOptional = appUtils.findUserIfExist(request.getFollowerId());
+    if (followerOptional.isEmpty()) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    var follower = followerOptional.get();
+    var user = optionalUser.get();
 
     var follows = followerRepository.follows(follower, user);
 
@@ -73,5 +81,22 @@ public class FollowerResource {
       log.info("User {} already followed by follower {}", userId, follower.getId());
     }
     return Response.status(Response.Status.NO_CONTENT).build();
+  }
+
+
+  @GET
+  public Response getUserFollowers(@PathParam("userId") Long userId) {
+    var userOptional = appUtils.findUserIfExist(userId);
+    if (userOptional.isEmpty()) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    List<Follower> allFollowersByUserId = followerRepository.findAllFollowersByUserId(userId);
+    List<FollowerResponseDTO> followerResponseDTOS = allFollowersByUserId.stream().map(FollowerResponseDTO::mapDtoFromModel).toList();
+
+    var response = UserFollowersResponseDTO.builder()
+          .followersCount(allFollowersByUserId.size())
+          .userFollowers(followerResponseDTOS)
+          .build();
+    return Response.ok(response).build();
   }
 }

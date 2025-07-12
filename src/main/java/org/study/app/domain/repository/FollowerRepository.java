@@ -9,6 +9,7 @@ import org.study.app.domain.model.User;
 
 import java.sql.ParameterMetaData;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
@@ -29,5 +30,10 @@ public class FollowerRepository implements PanacheRepository<Follower> {
     var followerResult = followerPanacheQuery.firstResultOptional();
 
     return followerResult.isPresent();
+  }
+
+  public List<Follower> findAllFollowersByUserId(Long userId) {
+    PanacheQuery<Follower> followerPanacheQuery = find("user.id", userId);
+    return followerPanacheQuery.list();
   }
 }
