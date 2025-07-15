@@ -50,9 +50,9 @@ public class FollowerResource {
       var responseMap = new HashMap<>();
       responseMap.put("responseMessage", message);
       try {
-        return Response.status(409).entity(mapper.writeValueAsString(responseMap)).build();
+        return Response.status(Response.Status.CONFLICT).entity(mapper.writeValueAsString(responseMap)).build();
       } catch (JsonProcessingException e) {
-        return Response.status(409).entity(message).build();
+        return Response.status(Response.Status.CONFLICT).entity(message).build();
       }
     }
 
@@ -98,5 +98,15 @@ public class FollowerResource {
           .userFollowers(followerResponseDTOS)
           .build();
     return Response.ok(response).build();
+  }
+
+  @DELETE
+  public Response unfollowUser(@PathParam("userId") Long userId) {
+    var optUser = appUtils.findUserIfExist(userId);
+    if (optUser.isEmpty()) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    return Response.status(Response.Status.NO_CONTENT).build();
   }
 }
