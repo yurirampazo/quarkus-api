@@ -101,12 +101,15 @@ public class FollowerResource {
   }
 
   @DELETE
-  public Response unfollowUser(@PathParam("userId") Long userId) {
+  @Transactional
+  public Response unfollowUser(@PathParam("userId") Long userId,
+                               @QueryParam("followerId") Long followerId) {
     var optUser = appUtils.findUserIfExist(userId);
     if (optUser.isEmpty()) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    followerRepository.unfollowUserById(followerId, userId);
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 }
