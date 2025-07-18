@@ -27,7 +27,7 @@ class UserResourceTest {
   @Test
   @Order(1)
   @DisplayName("Should create user successfully")
-  public void createUserTest() {
+  void createUserTest() {
     var user = User.builder()
         .name("Fulano")
         .age(30)
@@ -47,7 +47,7 @@ class UserResourceTest {
   @Test
   @Order(2)
   @DisplayName("Should throw error while trying to create user wrongly")
-  public void createUserErrorTest() {
+  void createUserErrorTest() {
     var user = User.builder()
         .name(null)
         .age(null)
@@ -72,7 +72,7 @@ class UserResourceTest {
   @Test
   @Order(3)
   @DisplayName("Should list all users")
-  public void listAllUsesTest() {
+  void listAllUsesTest() {
     given()
         .contentType(ContentType.JSON)
         .when()

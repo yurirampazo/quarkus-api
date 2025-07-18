@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "posts")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode

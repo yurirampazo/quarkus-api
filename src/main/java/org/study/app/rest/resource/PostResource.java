@@ -13,7 +13,6 @@ import org.study.app.AppUtils;
 import org.study.app.domain.model.Post;
 import org.study.app.domain.repository.FollowerRepository;
 import org.study.app.domain.repository.PostRepository;
-import org.study.app.domain.repository.UserRepository;
 import org.study.app.rest.dto.CreatePostRequestDTO;
 import org.study.app.rest.dto.PostResponseDTO;
 
