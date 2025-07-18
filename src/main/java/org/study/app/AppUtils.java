@@ -1,7 +1,6 @@
 package org.study.app;
 
 
-import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.study.app.domain.model.User;
@@ -20,6 +19,9 @@ public class AppUtils {
   }
 
   public Optional<User> findUserIfExist(Long userId) {
+    if (userId == null) {
+      return Optional.empty();
+    }
     return Optional.ofNullable(userRepository.findById(userId));
   }
 
