@@ -17,7 +17,6 @@ import org.study.app.rest.dto.CreatePostRequestDTO;
 import org.study.app.rest.dto.PostResponseDTO;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Path("/users/{userId}/posts")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,16 +26,12 @@ public class PostResource {
   private final PostRepository postRepository;
   private final FollowerRepository followerRepository;
   private final AppUtils appUtils;
-  private final Validator validator;
-  private final ObjectMapper mapper;
 
   @Inject
-  public PostResource(FollowerRepository followerRepository, PostRepository postRepository, Validator validator, AppUtils appUtils) {
+  public PostResource(FollowerRepository followerRepository, PostRepository postRepository, AppUtils appUtils) {
     this.postRepository = postRepository;
     this.followerRepository = followerRepository;
     this.appUtils = appUtils;
-    this.validator = validator;
-    mapper = new ObjectMapper();
   }
 
   @POST
@@ -62,7 +57,7 @@ public class PostResource {
     var mapResponse = new HashMap<String, Object>();
     if (optionalUser.isEmpty()) {
       mapResponse.put(RESPONSE_MESSAGE, "User not found!");
-      return Response.status(Response.Status.NOT_FOUND).entity(jsonResponseFromMap(mapResponse)).build();
+      return Response.status(Response.Status.NOT_FOUND).entity(mapResponse).build();
     }
     var user = optionalUser.get();
 
@@ -70,13 +65,13 @@ public class PostResource {
     var optionalFollower = appUtils.findUserIfExist(followerId);
     if (optionalFollower.isEmpty()) {
       mapResponse.put(RESPONSE_MESSAGE, "No user found for follower id");
-      return Response.status(Response.Status.NOT_FOUND).entity(jsonResponseFromMap(mapResponse)).build();
+      return Response.status(Response.Status.NOT_FOUND).entity(mapResponse).build();
     }
     var follower = optionalFollower.get();
     var follows = followerRepository.follows(follower, user);
     if (!follows) {
       mapResponse.put(RESPONSE_MESSAGE, "You must follow the user to see it's posts");
-      return Response.status(Response.Status.FORBIDDEN).entity(jsonResponseFromMap(mapResponse)).build();
+      return Response.status(Response.Status.FORBIDDEN).entity(mapResponse).build();
     }
 
     /*
@@ -90,14 +85,5 @@ public class PostResource {
           .map(PostResponseDTO::mapFromPost)
           .toList();
     return Response.ok(postResponses).build();
-  }
-
-
-  private <T> String jsonResponseFromMap(Map<String, T> mapResponse) {
-    try {
-      return mapper.writeValueAsString(mapResponse);
-    } catch (JsonProcessingException e) {
-      return mapResponse.toString();
-    }
   }
 }

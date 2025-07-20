@@ -1,6 +1,5 @@
 package org.study.app.rest.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -28,14 +27,12 @@ public class UserResource {
   private final UserRepository userRepository;
   private final AppUtils appUtils;
   private final Validator validator;
-  private final ObjectMapper mapper;
 
   @Inject
   public UserResource(UserRepository userRepository, Validator validator, AppUtils appUtils) {
     this.userRepository = userRepository;
     this.appUtils = appUtils;
     this.validator = validator;
-    mapper = new ObjectMapper();
   }
 
   @POST

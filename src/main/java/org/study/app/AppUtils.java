@@ -29,5 +29,4 @@ public class AppUtils {
     return text != null && !text.isBlank();
   }
 
-
 }
