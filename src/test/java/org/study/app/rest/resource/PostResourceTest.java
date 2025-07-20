@@ -2,6 +2,7 @@ package org.study.app.rest.resource;
 
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
@@ -35,6 +36,10 @@ class PostResourceTest {
   @Inject
   PostRepository postRepository;
 
+  Long userId;
+  Long nonFollowerId;
+  Long followerId;
+
   @BeforeEach
   @Transactional
   void setUp() {
@@ -56,6 +61,10 @@ class PostResourceTest {
     userRepository.persist(user);
     userRepository.persist(nonFollower);
     userRepository.persist(follower);
+
+    userId = user.getId();
+    nonFollowerId = nonFollower.getId();
+    followerId = follower.getId();
 
     Follower followerModel = Follower.builder()
         .user(user)
@@ -81,9 +90,9 @@ class PostResourceTest {
         .contentType(MediaType.APPLICATION_JSON)
         .body(postRequest)
         .pathParam("userId", userId)
-        .when()
+    .when()
         .post()
-        .then().statusCode(HttpStatus.SC_CREATED);
+    .then().statusCode(HttpStatus.SC_CREATED);
   }
 
   @Test
@@ -96,10 +105,11 @@ class PostResourceTest {
 
     given()
         .body(postRequest)
+        .contentType(ContentType.JSON)
         .pathParam("userId", userId)
-        .when()
+    .when()
         .post()
-        .then()
+    .then()
         .statusCode(SC_NOT_FOUND);
   }
 
@@ -110,9 +120,9 @@ class PostResourceTest {
 
     given()
         .pathParam("userId", userId)
-        .when()
+    .when()
         .get()
-        .then()
+    .then()
         .statusCode(SC_NOT_FOUND);
   }
 
@@ -140,13 +150,14 @@ class PostResourceTest {
     var userId = 1;
     var followerId = 777;
 
-    var response = given()
-        .pathParam("userId", userId)
-        .header("followerId", followerId)
+    var response =
+        given()
+          .pathParam("userId", userId)
+          .header("followerId", followerId)
         .when()
-        .get()
+          .get()
         .then()
-        .extract().response();
+          .extract().response();
 
     final var NO_FOLLOWER_MESSAGE = "No user found for follower id";
 
@@ -157,16 +168,14 @@ class PostResourceTest {
   @Test
   @DisplayName("Should throw error when trying to list registered user but trying with a non follower")
   void listPostsFollowerNotFoundTest() {
-    var userId = 1;
-    var followerId = 2;
 
     var response = given()
-        .pathParam("userId", userId)
-        .header("followerId", followerId)
+          .pathParam("userId", userId)
+          .header("followerId", nonFollowerId)
         .when()
-        .get()
+          .get()
         .then()
-        .extract().response();
+          .extract().response();
 
     final var FORBIDDEN_MESSAGE = "You must follow the user to see it's posts";
 
@@ -177,16 +186,14 @@ class PostResourceTest {
   @Test
   @DisplayName("Should list posts successfully")
   void listPosts() {
-    var userId = 1;
-    var followerId = 3;
 
     var response = given()
-        .pathParam("userId", userId)
-        .header("followerId", followerId)
+          .pathParam("userId", userId)
+          .header("followerId", followerId)
         .when()
-        .get()
+          .get()
         .then()
-        .extract().response();
+          .extract().response();
 
     assertEquals(HttpStatus.SC_OK, response.statusCode(), "Must be equals");
     assertFalse(response.jsonPath().getList("").isEmpty(), "Must not be empty");

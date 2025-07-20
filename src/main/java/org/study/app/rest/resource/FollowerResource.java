@@ -1,10 +1,7 @@
 package org.study.app.rest.resource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Validator;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -12,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.study.app.AppUtils;
 import org.study.app.domain.model.Follower;
 import org.study.app.domain.repository.FollowerRepository;
-import org.study.app.domain.repository.UserRepository;
 import org.study.app.rest.dto.FollowerRequestDTO;
 import org.study.app.rest.dto.FollowerResponseDTO;
 import org.study.app.rest.dto.UserFollowersResponseDTO;
@@ -26,19 +22,14 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class FollowerResource {
 
-  private final UserRepository userRepository;
   private final FollowerRepository followerRepository;
   private final AppUtils appUtils;
-  private final Validator validator;
-  private ObjectMapper mapper = new ObjectMapper();
 
   @Inject
-  public FollowerResource(UserRepository userRepository, FollowerRepository followerRepository,
-                          AppUtils appUtils, Validator validator) {
-    this.userRepository = userRepository;
+  public FollowerResource(FollowerRepository followerRepository,
+                          AppUtils appUtils) {
     this.followerRepository = followerRepository;
     this.appUtils = appUtils;
-    this.validator = validator;
   }
 
   @PUT
@@ -47,13 +38,9 @@ public class FollowerResource {
 
     if (userId.equals(request.getFollowerId())) {
       var message = "You can´t follow yourself";
-      var responseMap = new HashMap<>();
+      var responseMap = new HashMap<String, Object>();
       responseMap.put("responseMessage", message);
-      try {
-        return Response.status(Response.Status.CONFLICT).entity(mapper.writeValueAsString(responseMap)).build();
-      } catch (JsonProcessingException e) {
-        return Response.status(Response.Status.CONFLICT).entity(message).build();
-      }
+      return Response.status(Response.Status.CONFLICT).entity(responseMap).build();
     }
 
     var optionalUser = appUtils.findUserIfExist(userId);
@@ -94,9 +81,9 @@ public class FollowerResource {
     List<FollowerResponseDTO> followerResponseDTOS = allFollowersByUserId.stream().map(FollowerResponseDTO::mapDtoFromModel).toList();
 
     var response = UserFollowersResponseDTO.builder()
-          .followersCount(allFollowersByUserId.size())
-          .userFollowers(followerResponseDTOS)
-          .build();
+        .followersCount(allFollowersByUserId.size())
+        .userFollowers(followerResponseDTOS)
+        .build();
     return Response.ok(response).build();
   }
 

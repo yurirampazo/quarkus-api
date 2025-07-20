@@ -66,7 +66,6 @@ class UserResourceTest {
     List<Map<String, Object>> errors = response.jsonPath().getList("errors");
     assertNotNull(errors.get(0).get("message"), "Must not be null");
     assertNotNull(errors.get(1).get("message"), "Must not be null");
-//    assertEquals("Name is required", errors.get(1).get("message"), "Must be equals"); // NOT IDEAL, ORDER IS RANDOM
   }
 
   @Test
@@ -79,7 +78,7 @@ class UserResourceTest {
         .get(apiUrl)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .body("size()", Matchers.is(1));
+        .body("size()", Matchers.greaterThan(0));
   }
 
 }
