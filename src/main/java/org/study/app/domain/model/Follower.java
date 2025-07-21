@@ -11,14 +11,16 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table(name = "users")
-public class User /*extends PanacheEntityBase*/ {
+@Table(name = "followers")
+public class Follower {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  @Column(name = "name")
-  private String name;
-  @Column(name = "age")
-  private Integer age;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+  @ManyToOne
+  @JoinColumn(name = "follower_id")
+  private User follower;
 }
